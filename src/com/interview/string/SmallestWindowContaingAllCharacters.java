@@ -1,6 +1,8 @@
 package com.interview.string;
 
 /**
+ * References
+ * https://leetcode.com/problems/minimum-window-substring/
  * http://www.geeksforgeeks.org/find-the-smallest-window-in-a-string-containing-all-characters-of-another-string/
  */
 import java.util.HashMap;
@@ -8,92 +10,60 @@ import java.util.Map;
 
 public class SmallestWindowContaingAllCharacters {
 
-	private void updateMap(Map<Character, Integer> map, Character ch) {
-		int count = 1;
-		if (map.containsKey(ch)) {
-			count = map.get(ch);
-			count++;
-		}
-		map.put(ch, count);
-	}
+    public String minWindow(String s, String t) {
+        Map<Character, Integer> countMap = new HashMap<>();
+        for (char ch : t.toCharArray()) {
+            Integer val = countMap.get(ch);
+            if (val == null) {
+                val = 0;
+            }
+            countMap.put(ch, val + 1);
+        }
+        int start = 0;
+        int currLen = t.length();
+        int minWindow = Integer.MAX_VALUE;
+        int minStart = 0;
+        int i = 0;
+        while (i < s.length()) {
+            Integer val = countMap.get(s.charAt(i));
+            if (val == null) {
+                i++;
+                continue;
+            }
+            if (val > 0) {
+                currLen--;
+            }
+            val--;
+            countMap.put(s.charAt(i), val);
+            while (currLen == 0) {
+                if (minWindow > i - start + 1) {
+                    minWindow = i - start + 1;
+                    minStart = start;
+                }
+                Integer val1 = countMap.get(s.charAt(start));
+                if (val1 != null) {
+                    if (val1 == 0) {
+                        break;
+                    } else {
+                        val1++;
+                        countMap.put(s.charAt(start), val1);
+                    }
+                }
+                start++;
+            }
+            i++;
+        }
 
-	private void updateMapDecreaseCount(Map<Character, Integer> map, Character ch) {
-		int count = map.get(ch);
-		count--;
-		map.put(ch, count);
-	}
+        return minWindow != Integer.MAX_VALUE ? s.substring(minStart, minStart + minWindow) : "";
+    }
 
-	public int smallestWindow(char[] str, char[] subString) {
+    public static void main(String args[]) {
 
-		Map<Character, Integer> subStringVisited = new HashMap<Character, Integer>();
-		Map<Character, Integer> mainStringVisited = new HashMap<Character, Integer>();
-		for (int i = 0; i < subString.length; i++) {
-			updateMap(subStringVisited, subString[i]);
-		}
-		int i = 0;
-		int startIndex = -1;
-		int count = 0;
-		// initial big window
-		for (; i < str.length; i++) {
-			if (subStringVisited.containsKey(str[i])) {
-				if (startIndex == -1) {
-					startIndex = i;
-				}
-				updateMap(mainStringVisited, str[i]);
-				if (mainStringVisited.get(str[i]) == subStringVisited
-						.get(str[i])) {
-					count += mainStringVisited.get(str[i]);
-				}
-				if (count == subString.length) {
-					break;
-				}
-			}
-		}
-		int endIndex = i;
-		System.out.println(startIndex + " " + i);
-
-		i = trimWindow(startIndex,str,endIndex,mainStringVisited,subStringVisited);
-			
-		System.out.print(i + " " + endIndex);
-		int minWindow = endIndex - i +1;
-		startIndex =i;
-		for(i = endIndex+1 ; i < str.length; i++){
-			if(subStringVisited.containsKey(str[i])){
-				updateMap(mainStringVisited,str[i]);
-			}
-			if(str[startIndex] == str[i]){
-				startIndex =trimWindow(startIndex,str,i,mainStringVisited,subStringVisited);
-				if(minWindow > i - startIndex + 1){
-					minWindow = i-startIndex +1;
-				}
-			}
-		}
-		return minWindow;
-	}
-	
-	private int trimWindow(int startIndex, char[] str, int endIndex,Map<Character,Integer> mainStringVisited, Map<Character,Integer> subStringVisited){
-		int i=0;
-		for (i = startIndex; i <= endIndex; i++) {
-
-			if (mainStringVisited.containsKey(str[i])){
-				if(mainStringVisited.get(str[i]) > subStringVisited
-							.get(str[i])) {
-					updateMapDecreaseCount(mainStringVisited, str[i]);
-				}else{
-					break;
-				}
-			}
-		}
-		return i;
-	}
-
-	public static void main(String args[]) {
-
-		String str = "Tsuaosyogrlmnsluuorjkoruost";
-		String subString = "soor";
-		SmallestWindowContaingAllCharacters swcac = new SmallestWindowContaingAllCharacters();
-		int minWindow = swcac.smallestWindow(str.toCharArray(), subString.toCharArray());
-		System.out.println(minWindow);
-	}
+        String str = "Tsuaosyogrlmnsluuorjkoruost";
+        String subString = "soor";
+        SmallestWindowContaingAllCharacters swcac = new SmallestWindowContaingAllCharacters();
+        String result = swcac.minWindow(str, subString);
+        System.out.println(result);
+    }
 
 }

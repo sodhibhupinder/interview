@@ -10,37 +10,29 @@ import java.util.List;
  */
 public class UniquePartitionOfInteger {
 
-	private int i=0;
-	public void partition(int n){
-		List<Integer> result = new ArrayList<Integer>();
-		partition(n,n,result);
-	}
-	
-	private void partition(int n, int start,List<Integer> result){
-		if(n == 0){
-			i++;
-			System.out.print(i + " ");
-			for(int c : result){
-				System.out.print(c + " ");
-			}
-			System.out.println();
-			return;
-		}
-			
-		for(int i= start; i >=1 ; i--){
-			result.add(i);
-			if(n-i < i){
-				start = n-i;
-			}else{
-				start = i;
-			}
-			partition(n-i,start,result);
-			result.remove(result.size()-1);
-		}
-	}
-	
-	public static void main(String args[]){
-		UniquePartitionOfInteger upi = new UniquePartitionOfInteger();
-		upi.partition(12);
-	}
+    public void partition(int n){
+        List<Integer> result = new ArrayList<Integer>();
+        partition(n,n,result);
+    }
+    
+    private void partition(int n, int max,List<Integer> result){
+        if(n < 0){
+            return ;
+        }
+        if(n == 0){
+            result.forEach(i -> System.out.print(i + " "));
+            System.out.println();
+            return;
+        }
+        for(int i=Math.min(n, max); i > 0 && i <= max; i--){
+            result.add(i);
+            partition(n-i,i, result);
+            result.remove(result.size()-1);
+        }
+   }
+    
+    public static void main(String args[]){
+        UniquePartitionOfInteger upi = new UniquePartitionOfInteger();
+        upi.partition(12);
+    }
 }
